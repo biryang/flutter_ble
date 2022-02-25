@@ -2,7 +2,7 @@ import 'package:ble_app/app/controller/ble_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomePage extends GetView<BleController> {
+class ScanPage extends GetView<BleController> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BleController>(builder: (_) {
@@ -30,6 +30,15 @@ class HomePage extends GetView<BleController> {
                             leading: const Icon(Icons.bluetooth),
                             title: Text(name),
                             subtitle: Text(mac),
+                            trailing: ElevatedButton(
+                              child: _.isConnected
+                                  ? Text('Disconnect')
+                                  : Text('Connect'),
+                              onPressed: () => _.isConnected
+                                  ? _.disconnect(_.scanList![idx])
+                                  : _.connect(_.scanList![idx]),
+                            ),
+                            onTap: () => _.selDevice(_.scanList![idx]),
                           ),
                         );
                       }),

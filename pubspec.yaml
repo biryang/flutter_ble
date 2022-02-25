@@ -36,6 +36,7 @@ dependencies:
   flutter_blue: ^0.8.0
   flutter_lints: ^1.0.0
   get: ^4.6.1
+  msix: ^3.2.0
 
 dev_dependencies:
   flutter_test:

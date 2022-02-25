@@ -11,6 +11,8 @@ class BleController extends GetxController {
   List<ScanResult>? scanList = [];
   String controllerName = 'bleCon';
   bool isScanning = false;
+  bool isConnected = false;
+  BluetoothDeviceState _deviceState = BluetoothDeviceState.disconnected;
 
   BleController() {
     initBle();
@@ -48,11 +50,51 @@ class BleController extends GetxController {
     }
   }
 
+  selDevice(ScanResult r) async {
+    print(r);
+  }
+
   connect(ScanResult r) async {
-    await r.device.connect();
+    /*
+      타임아웃을 10초(10000ms)로 설정 및 autoconnect 해제
+       참고로 autoconnect가 true되어있으면 연결이 지연되는 경우가 있음.
+     */
+    await r.device
+        .connect(autoConnect: false)
+        .timeout(Duration(milliseconds: 10000), onTimeout: () {
+      //타임아웃 발생
+      print('disconnected');
+      connectionState(BluetoothDeviceState.disconnected);
+    }).then((data) {
+      print('connected');
+      connectionState(BluetoothDeviceState.connected);
+    });
+
+    // await r.device.connect();
   }
 
   disconnect(ScanResult r) async {
-    await r.device.disconnect();
+    try {
+      connectionState(BluetoothDeviceState.disconnected);
+      await r.device.disconnect();
+    } catch (e) {}
+  }
+
+  connectionState(BluetoothDeviceState event) {
+    switch (event) {
+      case BluetoothDeviceState.disconnected:
+        isConnected = false;
+        break;
+      case BluetoothDeviceState.disconnecting:
+        break;
+      case BluetoothDeviceState.connected:
+        isConnected = true;
+        break;
+      case BluetoothDeviceState.connecting:
+        break;
+    }
+
+    _deviceState = event;
+    update();
   }
 }
