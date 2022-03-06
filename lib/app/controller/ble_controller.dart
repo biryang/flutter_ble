@@ -3,11 +3,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 
 class BleController extends GetxController {
-  FlutterBlue flutterBlue = FlutterBlue.instance;
+  FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
   List<ScanResult>? scanList = [];
   String controllerName = 'bleCon';
   bool isScanning = false;
@@ -29,6 +29,7 @@ class BleController extends GetxController {
   scan() async {
     if (!isScanning) {
       print("start scanning");
+      flutterBlue.turnOn();
       // 기존에 스캔된 리스트 삭제
       scanList?.clear();
       // 스캔 4초간 진행
