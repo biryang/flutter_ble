@@ -7,11 +7,16 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 
 class BleController extends GetxController {
+  final String SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb";
+  final String CHARACTERISTIC_UUID = "0000fff2-0000-1000-8000-00805f9b34fb";
+  Stream<List<int>>? stream;
+
   FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
   List<ScanResult>? scanList = [];
   String controllerName = 'bleCon';
   bool isScanning = false;
   bool isConnected = false;
+  String selDevice = '';
   BluetoothDeviceState _deviceState = BluetoothDeviceState.disconnected;
 
   BleController() {
@@ -51,10 +56,6 @@ class BleController extends GetxController {
     }
   }
 
-  selDevice(ScanResult r) async {
-    print(r);
-  }
-
   connect(ScanResult r) async {
     /*
       타임아웃을 10초(10000ms)로 설정 및 autoconnect 해제
@@ -69,9 +70,25 @@ class BleController extends GetxController {
     }).then((data) {
       print('connected');
       connectionState(BluetoothDeviceState.connected);
+      selDevice = r.device.id.id;
+      update();
     });
+  }
 
-    // await r.device.connect();
+  discoverServices(BluetoothDevice d) async {
+    List<BluetoothService> services = await d.discoverServices();
+
+    for (var service in services) {
+      if (service.uuid.toString() == SERVICE_UUID) {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == CHARACTERISTIC_UUID) {
+            print(characteristic.isNotifying);
+            print(service.uuid.toString());
+            print(characteristic.uuid.toString());
+          }
+        }
+      }
+    }
   }
 
   disconnect(ScanResult r) async {
@@ -79,6 +96,7 @@ class BleController extends GetxController {
       connectionState(BluetoothDeviceState.disconnected);
       await r.device.disconnect();
     } catch (e) {}
+    // flutterBlue.turnOff();
   }
 
   connectionState(BluetoothDeviceState event) {

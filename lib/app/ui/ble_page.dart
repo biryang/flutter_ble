@@ -2,7 +2,9 @@ import 'package:ble_app/app/controller/ble_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ScanPage extends GetView<BleController> {
+class BlePage extends GetView<BleController> {
+  const BlePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BleController>(builder: (_) {
@@ -31,14 +33,15 @@ class ScanPage extends GetView<BleController> {
                             title: Text(name),
                             subtitle: Text(mac),
                             trailing: ElevatedButton(
-                              child: _.isConnected
+                              child: _.isConnected &&
+                                      _.selDevice ==
+                                          _.scanList![idx].device.id.id
                                   ? Text('Disconnect')
                                   : Text('Connect'),
                               onPressed: () => _.isConnected
                                   ? _.disconnect(_.scanList![idx])
                                   : _.connect(_.scanList![idx]),
                             ),
-                            onTap: () => _.selDevice(_.scanList![idx]),
                           ),
                         );
                       }),
